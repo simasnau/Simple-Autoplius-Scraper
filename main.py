@@ -23,7 +23,7 @@ def elementExistsByClass(name):
 def getData():
 
     writer = csv.writer(csvFile)
-    writer.writerow(('Model', 'Price', 'Year',
+    writer.writerow(('Make','Model', 'Price', 'Year',
                     'Mileage', 'Displacement', 'Power', 'Link'))
 
     while elementExistsByClass('next'):
@@ -41,6 +41,17 @@ def getData():
                 else : displacement=0
 
                 makeModel=title.split(",")[0]
+
+                make=makeModel
+                model=""
+                for m in makes:
+                    if m in makeModel.lower():
+                        make=m
+                        model=makeModel.lower().replace(m,"").strip()
+                        print("Make: ", make, ", model: ", model)
+                        break
+
+
                 print("Title: ", makeModel)
                 params = post.find_element_by_class_name('bottom-aligner')
                 
@@ -63,7 +74,7 @@ def getData():
 
                 print(price)
 
-                writer.writerow((makeModel, price, data, rida, displacement, galia, link))
+                writer.writerow((make, model, price, data, rida, displacement, galia, link))
             except Exception as e:
                 print(e)
 
@@ -77,6 +88,17 @@ def getData():
 
 # WebDriver setup
 driver = webdriver.Chrome(ChromeDriverManager().install())
+
+driver.get("https://autoplius.lt/")
+options=driver.find_elements_by_xpath("//div[@class='dropdown-option js-option ']")
+makes = []
+for option in options:
+    altTitle=str(option.get_attribute("data-title"))
+    if not altTitle.isdigit():
+        makes.append(altTitle.lower())
+    else: break
+
+
 driver.get("https://autoplius.lt/skelbimai/naudoti-automobiliai")
 sleep(0.2)
 
